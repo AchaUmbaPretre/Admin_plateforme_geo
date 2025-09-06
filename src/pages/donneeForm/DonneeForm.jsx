@@ -16,8 +16,34 @@ import { UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { postDonnees } from "../../services/donnees.service";
 import { getPays, getProvince, getType } from "../../services/type.service";
-
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import DOMPurify from "dompurify";
+import './donneeForm.scss'
 const { TextArea } = Input;
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    [{ font: [] }, { size: ["small", false, "large", "huge"] }],
+    ["bold", "italic", "underline", "strike"],
+    [{ color: [] }, { background: [] }],
+    [{ align: [] }],
+    [{ list: "ordered" }, { list: "bullet" }, { indent: "-1" }, { indent: "+1" }],
+    ["blockquote", "code-block"],
+    ["link"],
+    ["clean"],
+  ],
+  clipboard: { matchVisual: true },
+};
+
+const quillFormats = [
+  "header", "font", "size",
+  "bold", "italic", "underline", "strike",
+  "color", "background",
+  "align", "list", "indent",
+  "blockquote", "code-block", "link"
+];
 
 const DonneeForm = ({ record, onSuccess, setModalVisible }) => {
   const [form] = Form.useForm();
@@ -74,8 +100,10 @@ const DonneeForm = ({ record, onSuccess, setModalVisible }) => {
       Object.entries(values).forEach(([key, val]) => {
         if (key === "date_collecte" && val) {
           formData.append(key, val.format("YYYY-MM-DD"));
+        } else if (key === "description") {
+          formData.append("description", DOMPurify.sanitize(val || ""));
         } else {
-          formData.append(key, val || "");
+          formData.append(key, val ?? "");
         }
       });
 
@@ -83,10 +111,9 @@ const DonneeForm = ({ record, onSuccess, setModalVisible }) => {
       if (thumbPreview instanceof File) formData.append("vignette", thumbPreview);
 
       await postDonnees(formData);
-
       notification.success({ message: "Succès", description: "Donnée ajoutée" });
       setModalVisible(false);
-      onSuccess(); // recharge la table
+      onSuccess();
     } catch (err) {
       console.error(err);
       notification.error({ message: "Erreur", description: "Impossible de sauvegarder la donnée" });
@@ -94,6 +121,7 @@ const DonneeForm = ({ record, onSuccess, setModalVisible }) => {
       setLoading(false);
     }
   };
+
 
   return (
     <Form form={form} layout="vertical" onFinish={handleFinish}>
@@ -188,9 +216,21 @@ const DonneeForm = ({ record, onSuccess, setModalVisible }) => {
           </Form.Item>
         </Col>
       </Row>
-
-      <Form.Item label="Description" name="description">
-        <TextArea rows={4} placeholder="Description détaillée..." />
+      
+      <Form.Item
+        label="Description (mise en forme)"
+        name="description"
+        rules={[{ required: true, message: "La description est obligatoire" }]}
+      >
+        <ReactQuill
+          theme="snow"
+          modules={quillModules}
+          formats={quillFormats}
+          value={form.getFieldValue("description")}
+          onChange={(html) => form.setFieldsValue({ description: html })}
+          placeholder="Rédigez ici avec titres, tailles, alignements…"
+          style={{ background: "#fff" }}
+        />
       </Form.Item>
 
       <Row gutter={16}>

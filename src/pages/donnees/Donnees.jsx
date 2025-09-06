@@ -49,8 +49,8 @@ const Donnees = () => {
   /** Colonnes de la table **/
   const columns = [
     { title: "Titre", dataIndex: "titre", key: "titre", sorter: (a,b) => a.titre.localeCompare(b.titre) },
-    { title: "Description", dataIndex: "description", key: "description", ellipsis: true },
-    { title: "Pays", dataIndex: "pays", key: "pays" },
+/*     { title: "Description", dataIndex: "description", key: "description", ellipsis: true },
+ */    { title: "Pays", dataIndex: "pays", key: "pays" },
     { title: "Région", dataIndex: "region", key: "region" },
     { title: "Date collecte", 
       dataIndex: "date_collecte", 

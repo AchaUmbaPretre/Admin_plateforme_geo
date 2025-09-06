@@ -1,0 +1,11 @@
+/* marges internes et lisibilité */
+.ql-editor {
+  min-height: 220px;
+  padding: 24px 32px;   /* ← marges internes */
+  line-height: 1.6;
+}
+
+/* coins doux */
+.ql-container.ql-snow {
+  border-radius: 12px;
+}
