@@ -1,0 +1,32 @@
+@mixin mobileSE{
+    @media (max-width: 375px) {
+        @content;
+    }
+}
+@mixin mobile12pro{
+    @media (max-width: 390px) {
+        @content;
+    }
+}
+@mixin mobileXR{
+    @media (max-width: 480px) {
+        @content;
+    }
+}
+
+@mixin miniTablette{
+    @media (max-width: 568px) {
+        @content;
+    }
+}
+@mixin tablette{
+    @media (max-width: 960px) {
+        @content;
+    }
+}
+
+@mixin laptop{
+    @media (max-width: 992px) {
+        @content;
+    }
+}

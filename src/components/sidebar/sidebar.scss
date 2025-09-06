@@ -1,0 +1,94 @@
+@import "../../style.scss";
+
+.sidebar {
+  width: 240px;
+  height: calc(100vh - 60px);
+  position: sticky;
+  top: 60px;
+  left: 0;
+  background: #fff;
+  border-right: 1px solid #e6e6e6;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow-y: auto;
+  transition: all 0.3s ease;
+
+
+  .sidebar-menu {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      color: #444;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      position: relative;
+
+      .icon {
+        font-size: 1.2rem;
+        margin-right: 12px;
+        color: inherit;
+      }
+
+      &:hover {
+        background: rgba(24, 144, 255, 0.1);
+        color: #1890ff;
+
+        .icon {
+          color: #1890ff;
+        }
+      }
+
+      &.active {
+        background: rgba(24, 144, 255, 0.2);
+        color: #1890ff;
+        font-weight: 600;
+
+        &::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 4px;
+          height: 100%;
+          background: #1890ff;
+          border-radius: 2px 0 0 2px;
+        }
+      }
+
+      &.danger {
+        color: #d9363e;
+
+        &:hover {
+          background: #fff1f0;
+          color: #cf1322;
+
+          .icon {
+            color: #cf1322;
+          }
+        }
+      }
+    }
+  }
+
+  /* Scrollbar fine */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}

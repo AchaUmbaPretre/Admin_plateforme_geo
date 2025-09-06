@@ -1,0 +1,37 @@
+.layout {
+  display: flex;
+  height: 100vh; // toute la hauteur de l’écran
+}
+
+.sidebar {
+  width: 250px;
+  background: #2c3e50;
+  position: fixed; // Sidebar fixe
+  top: 0;
+  left: 0;
+  bottom: 0;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.topbar {
+  height: 60px;
+  background: #ecf0f1;
+  position: fixed;
+  top: 0;
+  left: 250px;
+  right: 0;
+  z-index: 10;
+}
+
+.content {
+  margin-top: 60px; // pour ne pas cacher sous la topbar
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto; // seul outlet scroll
+}
