@@ -47,14 +47,20 @@ const Paiement = () => {
 
   const columns = [
     {
+      title: "#",
+      dataIndex: "id",
+      key: "id",
+      render: (_, record, index) => index + 1
+    },
+    {
       title: "Utilisateur",
-      dataIndex: "id_utilisateur",
-      key: "id_utilisateur",
+      dataIndex: "nom",
+      key: "nom",
     },
     {
       title: "Abonnement",
-      dataIndex: "subscription_id",
-      key: "subscription_id",
+      dataIndex: "name",
+      key: "name",
     },
     {
       title: "Montant",
@@ -82,7 +88,7 @@ const Paiement = () => {
       dataIndex: "payment_date",
       key: "payment_date",
       render: (date) =>
-        date ? moment(date).format("DD/MM/YYYY HH:mm") : "—",
+        date ? moment(date).format("DD-MM-YYYY HH:mm") : "—",
       sorter: (a, b) => moment(a.payment_date) - moment(b.payment_date),
     },
     {
@@ -138,6 +144,7 @@ const Paiement = () => {
           pagination={{ pageSize: 10, showSizeChanger: true }}
           scroll={{ x: true }}
           sticky
+          size="small"
         />
       )}
 

@@ -52,10 +52,12 @@ const Donnees = () => {
 
   /** Colonnes de la table **/
   const columns = [
+    { title: "#", dataIndex: "titre", key: "titre", render : (text, record, index) => index + 1 },
     { title: "Titre", dataIndex: "titre", key: "titre", sorter: (a,b) => a.titre.localeCompare(b.titre) },
+    { title: "Type", dataIndex: "nom_type", key: "nom_type", sorter: (a,b) => a.titre.localeCompare(b.titre) },
 /*     { title: "Description", dataIndex: "description", key: "description", ellipsis: true },
- */    { title: "Pays", dataIndex: "pays", key: "pays" },
-    { title: "Région", dataIndex: "region", key: "region" },
+ */    { title: "Pays", dataIndex: "nom_pays", key: "nom_pays" },
+    { title: "Région", dataIndex: "name_fr", key: "name_fr" },
     { title: "Date collecte", 
       dataIndex: "date_collecte", 
       key: "date_collecte",
@@ -73,13 +75,13 @@ const Donnees = () => {
       title: "Fichier",
       dataIndex: "fichier_url",
       key: "fichier",
-      render: url => url ? <a href={`${DOMAIN}${url}`} target="_blank" rel="noopener noreferrer">Télécharger</a> : "—"
+      render: url => url ? <a href={`${DOMAIN}${url}`} target="_blank" rel="noopener noreferrer">Télécharger</a> : "Aucun"
     },
     {
       title: "Vignette",
       dataIndex: "vignette_url",
       key: "vignette",
-      render: url => url ? <Image src={`${DOMAIN}${url}`} width={80} height={50} /> : "—"
+      render: url => url ? <Image src={`${DOMAIN}${url}`} width={80} height={50} /> : "Aucune"
     },
     {
       title: "Actions",
