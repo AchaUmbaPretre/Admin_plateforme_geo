@@ -13,12 +13,16 @@ import {
 import { PlusOutlined, ReloadOutlined} from "@ant-design/icons";
 import DonneeForm from "../donneeForm/DonneeForm";
 import { getDonnees } from "../../services/donnees.service";
+import config from "../../config";
+import moment from "moment";
 
 const Donnees = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+  const DOMAIN = config.REACT_APP_SERVER_DOMAIN;
+
 
   /** Charger les données **/
   const loadDonnees = async () => {
@@ -54,7 +58,11 @@ const Donnees = () => {
     { title: "Région", dataIndex: "region", key: "region" },
     { title: "Date collecte", 
       dataIndex: "date_collecte", 
-      key: "date_collecte" },
+      key: "date_collecte",
+      render: (date) =>
+              date ? moment(date).format("DD-MM-YYYY") : "—",
+            sorter: (a, b) => moment(a.date_collecte) - moment(b.date_collecte),
+    },
     { 
       title: "Accès", 
       dataIndex: "acces", 
@@ -65,13 +73,13 @@ const Donnees = () => {
       title: "Fichier",
       dataIndex: "fichier_url",
       key: "fichier",
-      render: url => url ? <a href={url} target="_blank" rel="noopener noreferrer">Télécharger</a> : "—"
+      render: url => url ? <a href={`${DOMAIN}${url}`} target="_blank" rel="noopener noreferrer">Télécharger</a> : "—"
     },
     {
       title: "Vignette",
       dataIndex: "vignette_url",
       key: "vignette",
-      render: url => url ? <Image src={url} width={80} height={50} /> : "—"
+      render: url => url ? <Image src={`${DOMAIN}${url}`} width={80} height={50} /> : "—"
     },
     {
       title: "Actions",
