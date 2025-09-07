@@ -7,6 +7,10 @@ export const getDonnees = async () => {
     return axios.get(`${DOMAIN}/api/donnees`);
   };
 
+export const getDonneesCount = async () => {
+    return axios.get(`${DOMAIN}/api/donnees/count`);
+  };
+
 export const getDonneesOne = async (id) => {
     return axios.get(`${DOMAIN}/api/donnees/one?id=${id}`);
   };

@@ -5,6 +5,9 @@ import { ResponsiveBar } from "@nivo/bar";
 import { ResponsiveLine } from "@nivo/line";
 import axios from "axios";
 import "./home.scss";
+import { getUserCount, getUserStat } from "../../services/user.service";
+import { getPaymentCount, getPaymentStat } from "../../services/payment.service";
+import { getDonneesCount } from "../../services/donnees.service";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -20,11 +23,11 @@ const Home = () => {
     setLoading(true);
     try {
       const [usersRes, paymentsRes, donneesRes, paymentsGraphRes, usersGraphRes] = await Promise.all([
-        axios.get("/api/utilisateurs/count"),
-        axios.get("/api/payments/count"),
-        axios.get("/api/donnees/count"),
-        axios.get("/api/payments/graph"),
-        axios.get("/api/utilisateurs/graph")
+        getUserCount(),
+        getPaymentCount(),
+        getDonneesCount(),
+        getPaymentStat(),
+        getUserStat(),
       ]);
 
       setStats({
@@ -80,29 +83,55 @@ const Home = () => {
             <h3>Montant des paiements par mois</h3>
             {stats.paymentsData.length ? (
               <ResponsiveBar
-                data={stats.paymentsData}
-                keys={['amount']}
-                indexBy="month"
-                margin={{ top: 30, right: 30, bottom: 70, left: 70 }}
-                padding={0.4}
-                colors={{ scheme: 'set2' }}
-                borderRadius={6}
-                axisBottom={{
-                  tickRotation: -45,
-                  legend: 'Mois',
-                  legendPosition: 'middle',
-                  legendOffset: 50
-                }}
-                axisLeft={{
-                  legend: 'Montant ($)',
-                  legendPosition: 'middle',
-                  legendOffset: -60
-                }}
-                enableGridY={true}
-                animate
-                motionStiffness={90}
-                motionDamping={15}
-              />
+  data={stats.paymentsData}
+  keys={["amount"]}
+  indexBy="month"
+  margin={{ top: 30, right: 30, bottom: 70, left: 80 }}
+  padding={0.3}
+  valueScale={{ type: "linear" }}
+  indexScale={{ type: "band", round: true }}
+  colors={{ scheme: "category10" }}
+  borderRadius={4}
+  axisBottom={{
+    tickRotation: -30,
+    legend: "Mois",
+    legendPosition: "middle",
+    legendOffset: 50,
+  }}
+  axisLeft={{
+    legend: "Montant ($)",
+    legendPosition: "middle",
+    legendOffset: -70,
+    format: (v) => `$${v}`,
+  }}
+  enableGridY={true}
+  enableLabel={false}
+  tooltip={({ indexValue, value }) => (
+    <div
+      style={{
+        background: "white",
+        padding: "8px 12px",
+        border: "1px solid #ccc",
+        borderRadius: "8px",
+      }}
+    >
+      <strong>{indexValue}</strong>
+      <br />
+      💵 {value} $
+    </div>
+  )}
+  theme={{
+    axis: {
+      ticks: {
+        text: { fontSize: 12, fill: "#555" },
+      },
+      legend: { text: { fontSize: 14, fill: "#333" } },
+    },
+    tooltip: { container: { fontSize: 13 } },
+  }}
+  motionConfig="wobbly"
+/>
+
             ) : <Skeleton active paragraph={{ rows: 6 }} />}
           </Card>
         </Col>
@@ -112,30 +141,58 @@ const Home = () => {
             <h3>Nouvel utilisateur par mois</h3>
             {stats.usersData.length ? (
               <ResponsiveLine
-                data={[{ id: 'Utilisateurs', data: stats.usersData.map(d => ({ x: d.month, y: d.users })) }]}
-                margin={{ top: 30, right: 30, bottom: 70, left: 70 }}
-                xScale={{ type: 'point' }}
-                yScale={{ type: 'linear', min: 0 }}
-                curve="monotoneX"
-                axisBottom={{
-                  tickRotation: -45,
-                  legend: 'Mois',
-                  legendPosition: 'middle',
-                  legendOffset: 50
-                }}
-                axisLeft={{
-                  legend: 'Utilisateurs',
-                  legendPosition: 'middle',
-                  legendOffset: -60
-                }}
-                colors={{ scheme: 'nivo' }}
-                pointSize={8}
-                pointColor={{ theme: 'background' }}
-                pointBorderWidth={2}
-                pointBorderColor={{ from: 'serieColor' }}
-                enableArea={true}
-                animate
-              />
+  data={[
+    {
+      id: "Utilisateurs",
+      data: stats.usersData.map((d) => ({ x: d.month, y: d.users })),
+    },
+  ]}
+  margin={{ top: 30, right: 30, bottom: 70, left: 80 }}
+  xScale={{ type: "point" }}
+  yScale={{ type: "linear", min: 0, max: "auto", stacked: false }}
+  axisBottom={{
+    tickRotation: -30,
+    legend: "Mois",
+    legendPosition: "middle",
+    legendOffset: 50,
+  }}
+  axisLeft={{
+    legend: "Utilisateurs",
+    legendPosition: "middle",
+    legendOffset: -70,
+  }}
+  colors={["#1890ff"]}
+  pointSize={10}
+  pointBorderWidth={2}
+  pointBorderColor={{ from: "serieColor" }}
+  enableArea={true}
+  areaOpacity={0.15}
+  useMesh={true}
+  enableSlices="x"
+  tooltip={({ point }) => (
+    <div
+      style={{
+        background: "white",
+        padding: "8px 12px",
+        border: "1px solid #ccc",
+        borderRadius: "8px",
+      }}
+    >
+      📅 {point.data.xFormatted}
+      <br />
+      👤 {point.data.yFormatted} utilisateurs
+    </div>
+  )}
+  theme={{
+    axis: {
+      ticks: { text: { fontSize: 12, fill: "#555" } },
+      legend: { text: { fontSize: 14, fill: "#333" } },
+    },
+    tooltip: { container: { fontSize: 13 } },
+  }}
+  motionConfig="gentle"
+/>
+
             ) : <Skeleton active paragraph={{ rows: 6 }} />}
           </Card>
         </Col>
