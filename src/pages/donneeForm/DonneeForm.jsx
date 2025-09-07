@@ -126,7 +126,7 @@ const DonneeForm = ({ record, onSuccess, setModalVisible }) => {
       style={{ borderRadius: 16, boxShadow: "0 6px 20px rgba(0,0,0,0.08)" }}
       bodyStyle={{ padding: 24 }}
     >
-      <Title level={4} style={{ marginBottom: 24 }}>
+      <Title level={4} style={{ marginBottom: 10 }}>
         {record ? "✏️ Modifier la donnée" : "➕ Ajouter une nouvelle donnée"}
       </Title>
 
