@@ -1,34 +1,89 @@
 .home-dashboard {
+  padding: 24px;
+  background: #f5f6fa;
+  min-height: 100vh;
+}
+
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 16px;
   padding: 20px;
-  background: #f0f2f5;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s;
 
-  .stat-card {
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    transition: transform 0.3s, box-shadow 0.3s;
-
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
-    }
+  &:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
   }
 
-  .chart-card {
-    background: #fff;
+  .stat-icon {
+    width: 48px;
+    height: 48px;
     border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+    margin-right: 16px;
+  }
 
-    &:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  .ant-statistic {
+    .ant-statistic-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #555;
     }
-
-    h3 {
-      margin-bottom: 20px;
+    .ant-statistic-content {
+      font-size: 22px;
       font-weight: 600;
-      color: #333;
+      color: #222;
     }
   }
+}
+
+.chart-card {
+  border-radius: 16px;
+  padding: 20px;
+  height: 100%;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  h3 {
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #222;
+  }
+
+  .chart-container {
+    flex: 1;
+    min-height: 420px;
+  }
+}
+
+.tooltip-box {
+  background: #fff;
+  padding: 10px 14px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }

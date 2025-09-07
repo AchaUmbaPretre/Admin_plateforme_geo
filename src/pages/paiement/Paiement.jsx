@@ -8,10 +8,19 @@ import {
   notification,
   Space,
   Tooltip,
+  Typography,
+  Card,
+  Divider,
 } from "antd";
-import { EditOutlined, ReloadOutlined, DollarOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  ReloadOutlined,
+  DollarOutlined,
+} from "@ant-design/icons";
 import moment from "moment";
 import { getPayment } from "../../services/payment.service";
+
+const { Title, Text } = Typography;
 
 const Paiement = () => {
   const [data, setData] = useState([]);
@@ -45,22 +54,25 @@ const Paiement = () => {
     setModalVisible(true);
   };
 
+  /** Colonnes de la table **/
   const columns = [
     {
       title: "#",
-      dataIndex: "id",
-      key: "id",
-      render: (_, record, index) => index + 1
+      render: (_, __, index) => <Text strong>{index + 1}</Text>,
+      width: 60,
+      align: "center",
     },
     {
       title: "Utilisateur",
       dataIndex: "nom",
       key: "nom",
+      render: (val) => <Text>{val}</Text>,
     },
     {
       title: "Abonnement",
       dataIndex: "name",
       key: "name",
+      render: (val) => <Tag color="blue">{val}</Tag>,
     },
     {
       title: "Montant",
@@ -68,8 +80,8 @@ const Paiement = () => {
       key: "amount",
       render: (val) => (
         <Space>
-          <DollarOutlined />
-          ${val}
+          <DollarOutlined style={{ color: "#52c41a" }} />
+          <Text strong>${val.toLocaleString()}</Text>
         </Space>
       ),
     },
@@ -77,18 +89,24 @@ const Paiement = () => {
       title: "Méthode",
       dataIndex: "payment_method",
       key: "payment_method",
+      render: (method) => (
+        <Tag color="geekblue" style={{ borderRadius: 8 }}>
+          {method}
+        </Tag>
+      ),
     },
     {
       title: "Transaction ID",
       dataIndex: "transaction_id",
       key: "transaction_id",
+      render: (id) => <Text code>{id}</Text>,
     },
     {
       title: "Date paiement",
       dataIndex: "payment_date",
       key: "payment_date",
       render: (date) =>
-        date ? moment(date).format("DD-MM-YYYY HH:mm") : "—",
+        date ? moment(date).format("DD MMM YYYY HH:mm") : "—",
       sorter: (a, b) => moment(a.payment_date) - moment(b.payment_date),
     },
     {
@@ -97,8 +115,16 @@ const Paiement = () => {
       key: "status",
       render: (status) => {
         let color =
-          status === "success" ? "green" : status === "failed" ? "red" : "orange";
-        return <Tag color={color}>{status.toUpperCase()}</Tag>;
+          status === "success"
+            ? "green"
+            : status === "failed"
+            ? "red"
+            : "orange";
+        return (
+          <Tag color={color} style={{ borderRadius: 8, padding: "0 10px" }}>
+            {status.toUpperCase()}
+          </Tag>
+        );
       },
       filters: [
         { text: "Success", value: "success" },
@@ -110,10 +136,13 @@ const Paiement = () => {
     {
       title: "Actions",
       key: "actions",
+      fixed: "right",
+      width: 100,
       render: (_, record) => (
-        <Tooltip title="Voir / Modifier le paiement">
+        <Tooltip title="Voir détails">
           <Button
-            type="link"
+            type="text"
+            shape="circle"
             icon={<EditOutlined />}
             onClick={() => openModal(record)}
           />
@@ -123,13 +152,43 @@ const Paiement = () => {
   ];
 
   return (
-    <div style={{ padding: 24, background: "#fff", borderRadius: 12 }}>
-      <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }}>
-        <h2 style={{ margin: 0 }}>Tableau des Paiements</h2>
-        <Button type="default" icon={<ReloadOutlined />} onClick={fetchPaiements}>
-          Rafraîchir
-        </Button>
+    <Card
+      style={{
+        borderRadius: 16,
+        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+      }}
+      bodyStyle={{ padding: 24 }}
+    >
+      {/* Header */}
+      <Space
+        style={{
+          marginBottom: 20,
+          width: "100%",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <Title level={3} style={{ margin: 0 }}>
+            💳 Tableau des Paiements
+          </Title>
+          <Text type="secondary">
+            Suivi des transactions financières et abonnements.
+          </Text>
+        </div>
+        <Tooltip title="Rafraîchir">
+          <Button
+            type="default"
+            shape="round"
+            icon={<ReloadOutlined />}
+            onClick={fetchPaiements}
+          >
+            Rafraîchir
+          </Button>
+        </Tooltip>
       </Space>
+
+      <Divider style={{ margin: "12px 0 24px" }} />
 
       {loading ? (
         <div style={{ textAlign: "center", padding: "50px 0" }}>
@@ -140,43 +199,80 @@ const Paiement = () => {
           columns={columns}
           dataSource={data}
           rowKey="id_payments"
-          bordered
-          pagination={{ pageSize: 10, showSizeChanger: true }}
-          scroll={{ x: true }}
+          bordered={false}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total) => `Total: ${total} paiements`,
+          }}
+          scroll={{ x: "max-content" }}
           sticky
-          size="small"
+          size="middle"
         />
       )}
 
       {/* Modal détails paiement */}
       <Modal
-        title={editingRecord ? "Détails du paiement" : "Ajouter un paiement"}
-        visible={modalVisible}
+        title={
+          <Title level={4} style={{ margin: 0 }}>
+            {editingRecord ? "Détails du paiement" : "Ajouter un paiement"}
+          </Title>
+        }
+        open={modalVisible}
         onCancel={() => setModalVisible(false)}
         footer={null}
         destroyOnClose
         width={700}
+        centered
       >
         {editingRecord ? (
           <div style={{ lineHeight: 2 }}>
-            <p><strong>Utilisateur :</strong> {editingRecord.id_utilisateur}</p>
-            <p><strong>Abonnement :</strong> {editingRecord.subscription_id}</p>
-            <p><strong>Montant :</strong> ${editingRecord.amount}</p>
-            <p><strong>Méthode :</strong> {editingRecord.payment_method}</p>
-            <p><strong>Transaction ID :</strong> {editingRecord.transaction_id}</p>
+            <p>
+              <strong>Utilisateur :</strong> {editingRecord.nom}
+            </p>
+            <p>
+              <strong>Abonnement :</strong> {editingRecord.name}
+            </p>
+            <p>
+              <strong>Montant :</strong>{" "}
+              <Text strong>${editingRecord.amount}</Text>
+            </p>
+            <p>
+              <strong>Méthode :</strong> {editingRecord.payment_method}
+            </p>
+            <p>
+              <strong>Transaction ID :</strong>{" "}
+              <Text code>{editingRecord.transaction_id}</Text>
+            </p>
             <p>
               <strong>Date paiement :</strong>{" "}
               {editingRecord.payment_date
                 ? moment(editingRecord.payment_date).format("DD/MM/YYYY HH:mm")
                 : "—"}
             </p>
-            <p><strong>Statut :</strong> {editingRecord.status}</p>
+            <p>
+              <strong>Statut :</strong>{" "}
+              <Tag
+                color={
+                  editingRecord.status === "success"
+                    ? "green"
+                    : editingRecord.status === "failed"
+                    ? "red"
+                    : "orange"
+                }
+              >
+                {editingRecord.status.toUpperCase()}
+              </Tag>
+            </p>
           </div>
         ) : (
-          <p>Ajout de paiement désactivé pour l’instant.</p>
+          <Text type="secondary">
+            L’ajout de paiement est désactivé pour l’instant.
+          </Text>
         )}
       </Modal>
-    </div>
+    </Card>
   );
 };
 

@@ -8,6 +8,9 @@ import {
   notification,
   Tooltip,
   Space,
+  Typography,
+  Card,
+  Divider,
 } from "antd";
 import {
   EditOutlined,
@@ -21,11 +24,12 @@ import {
 import moment from "moment";
 import { getUsers } from "../../services/user.service";
 
+const { Title, Text } = Typography;
+
 const Utilisateur = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalLoading, setModalLoading] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
 
   /** Charger les utilisateurs **/
@@ -63,8 +67,8 @@ const Utilisateur = () => {
       sorter: (a, b) => a.nom.localeCompare(b.nom),
       render: (text) => (
         <Space>
-          <UserOutlined />
-          {text}
+          <UserOutlined style={{ color: "#1890ff" }} />
+          <Text strong>{text}</Text>
         </Space>
       ),
     },
@@ -74,8 +78,8 @@ const Utilisateur = () => {
       key: "email",
       render: (text) => (
         <Space>
-          <MailOutlined />
-          {text}
+          <MailOutlined style={{ color: "#fa8c16" }} />
+          <Text>{text}</Text>
         </Space>
       ),
     },
@@ -85,8 +89,8 @@ const Utilisateur = () => {
       key: "phone",
       render: (text) => (
         <Space>
-          <PhoneOutlined />
-          {text}
+          <PhoneOutlined style={{ color: "#52c41a" }} />
+          <Text>{text}</Text>
         </Space>
       ),
     },
@@ -95,7 +99,11 @@ const Utilisateur = () => {
       dataIndex: "role",
       key: "role",
       render: (role) => (
-        <Tag color={role === "admin" ? "red" : "blue"} icon={<CrownOutlined />}>
+        <Tag
+          color={role === "admin" ? "#ff4d4f" : "#2f54eb"}
+          icon={<CrownOutlined />}
+          style={{ borderRadius: 8, padding: "0 10px" }}
+        >
           {role.toUpperCase()}
         </Tag>
       ),
@@ -109,7 +117,8 @@ const Utilisateur = () => {
       title: "Expiration",
       dataIndex: "abonnement_expires_le",
       key: "abonnement_expires_le",
-      render: (date) => (date ? moment(date).format("DD/MM/YYYY") : "—"),
+      render: (date) =>
+        date ? moment(date).format("DD/MM/YYYY") : "—",
     },
     {
       title: "Créé le",
@@ -121,10 +130,13 @@ const Utilisateur = () => {
     {
       title: "Actions",
       key: "actions",
+      fixed: "right",
+      width: 100,
       render: (_, record) => (
-        <Tooltip title="Voir / Modifier l’utilisateur">
+        <Tooltip title="Voir / Modifier">
           <Button
-            type="link"
+            type="text"
+            shape="circle"
             icon={<EditOutlined />}
             onClick={() => openModal(record)}
           />
@@ -134,26 +146,55 @@ const Utilisateur = () => {
   ];
 
   return (
-    <div style={{ padding: 24, background: "#fff", borderRadius: 12 }}>
-      <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }}>
-        <h2 style={{ margin: 0 }}>Gestion des Utilisateurs</h2>
+    <Card
+      style={{
+        borderRadius: 16,
+        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+      }}
+      bodyStyle={{ padding: 24 }}
+    >
+      {/* Header */}
+      <Space
+        style={{
+          marginBottom: 20,
+          width: "100%",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <Title level={3} style={{ margin: 0 }}>
+            👥 Gestion des Utilisateurs
+          </Title>
+          <Text type="secondary">
+            Liste complète des utilisateurs avec rôles et abonnements.
+          </Text>
+        </div>
         <Space>
-          <Button
-            type="default"
-            icon={<ReloadOutlined />}
-            onClick={fetchUtilisateurs}
-          >
-            Rafraîchir
-          </Button>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => openModal()}
-          >
-            Nouvel utilisateur
-          </Button>
+          <Tooltip title="Rafraîchir">
+            <Button
+              type="default"
+              shape="round"
+              icon={<ReloadOutlined />}
+              onClick={fetchUtilisateurs}
+            >
+              Rafraîchir
+            </Button>
+          </Tooltip>
+          <Tooltip title="Ajouter un utilisateur">
+            <Button
+              type="primary"
+              shape="round"
+              icon={<PlusOutlined />}
+              onClick={() => openModal()}
+            >
+              Nouvel utilisateur
+            </Button>
+          </Tooltip>
         </Space>
       </Space>
+
+      <Divider style={{ margin: "12px 0 24px" }} />
 
       {loading ? (
         <div style={{ textAlign: "center", padding: "50px 0" }}>
@@ -164,28 +205,39 @@ const Utilisateur = () => {
           columns={columns}
           dataSource={data}
           rowKey="id_utilisateur"
-          bordered
-          pagination={{ pageSize: 8, showSizeChanger: true }}
-          scroll={{ x: true }}
+          bordered={false}
+          pagination={{
+            pageSize: 8,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total) => `Total: ${total} utilisateurs`,
+          }}
+          scroll={{ x: "max-content" }}
           sticky
+          size="middle"
         />
       )}
 
       {/* MODAL */}
       <Modal
-        title={editingRecord ? "Détails de l’utilisateur" : "Nouvel utilisateur"}
-        visible={modalVisible}
+        title={
+          <Title level={4} style={{ margin: 0 }}>
+            {editingRecord ? "Détails de l’utilisateur" : "Nouvel utilisateur"}
+          </Title>
+        }
+        open={modalVisible}
         onCancel={() => setModalVisible(false)}
         footer={null}
-        confirmLoading={modalLoading}
         destroyOnClose
+        width={700}
+        centered
       >
         {editingRecord ? (
           <div style={{ lineHeight: 2 }}>
             <p><strong>Nom :</strong> {editingRecord.nom}</p>
             <p><strong>Email :</strong> {editingRecord.email}</p>
             <p><strong>Téléphone :</strong> {editingRecord.phone}</p>
-            <p><strong>Rôle :</strong> {editingRecord.role}</p>
+            <p><strong>Rôle :</strong> {editingRecord.role.toUpperCase()}</p>
             <p>
               <strong>Expiration :</strong>{" "}
               {editingRecord.abonnement_expires_le
@@ -198,10 +250,12 @@ const Utilisateur = () => {
             </p>
           </div>
         ) : (
-          <p>Formulaire d’ajout d’utilisateur désactivé pour l’instant.</p>
+          <Text type="secondary">
+            Le formulaire d’ajout d’utilisateur est désactivé pour l’instant.
+          </Text>
         )}
       </Modal>
-    </div>
+    </Card>
   );
 };
 

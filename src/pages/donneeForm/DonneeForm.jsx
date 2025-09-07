@@ -11,6 +11,9 @@ import {
   InputNumber,
   Row,
   Col,
+  Typography,
+  Card,
+  Divider,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
@@ -19,8 +22,9 @@ import { getPays, getProvince, getType } from "../../services/type.service";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import DOMPurify from "dompurify";
-import './donneeForm.scss'
+
 const { TextArea } = Input;
+const { Title, Text } = Typography;
 
 const quillModules = {
   toolbar: [
@@ -52,10 +56,8 @@ const DonneeForm = ({ record, onSuccess, setModalVisible }) => {
   const [thumbPreview, setThumbPreview] = useState(record?.vignette_url || null);
   const [types, setTypes] = useState([]);
   const [pays, setPays] = useState([]);
-  const [province, setProvince] = useState([])
+  const [province, setProvince] = useState([]);
 
-
-  // Charger les types au montage
   useEffect(() => {
     const fetchTypes = async () => {
       try {
@@ -63,11 +65,10 @@ const DonneeForm = ({ record, onSuccess, setModalVisible }) => {
           getType(),
           getPays(),
           getProvince()
-        ]) 
+        ]);
         setTypes(typeData.data || []);
         setPays(paysData.data);
         setProvince(provinceData.data);
-
       } catch (err) {
         console.error("Erreur chargement types:", err);
       }
@@ -75,7 +76,6 @@ const DonneeForm = ({ record, onSuccess, setModalVisible }) => {
     fetchTypes();
   }, []);
 
-  // Pré-remplir si on édite
   useEffect(() => {
     if (record) {
       form.setFieldsValue({
@@ -96,7 +96,6 @@ const DonneeForm = ({ record, onSuccess, setModalVisible }) => {
     setLoading(true);
     try {
       const formData = new FormData();
-
       Object.entries(values).forEach(([key, val]) => {
         if (key === "date_collecte" && val) {
           formData.append(key, val.format("YYYY-MM-DD"));
@@ -122,196 +121,170 @@ const DonneeForm = ({ record, onSuccess, setModalVisible }) => {
     }
   };
 
-
   return (
-    <Form form={form} layout="vertical" onFinish={handleFinish}>
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            label="Type de donnée"
-            name="id_type"
-            rules={[{ required: true, message: "Le type est obligatoire" }]}
-          >
-            <Select
-              showSearch
-              options={types.map((item) => ({
-                value: item.id_type,
-                label: item.nom_type,
-              }))}
-              placeholder="Sélectionnez un type..."
-              optionFilterProp="label"
-            />
-          </Form.Item>
-        </Col>
+    <Card
+      style={{ borderRadius: 16, boxShadow: "0 6px 20px rgba(0,0,0,0.08)" }}
+      bodyStyle={{ padding: 24 }}
+    >
+      <Title level={4} style={{ marginBottom: 24 }}>
+        {record ? "✏️ Modifier la donnée" : "➕ Ajouter une nouvelle donnée"}
+      </Title>
 
-        <Col span={12}>
-          <Form.Item
-            label="Titre"
-            name="titre"
-            rules={[{ required: true, message: "Le titre est obligatoire" }]}
-          >
-            <Input placeholder="Titre de la donnée" />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item label="Pays" name="pays">
-            <Select
-              showSearch
-              options={pays.map((item) => ({
-                value: item.id_pays,
-                label: item.nom_pays,
-              }))}
-              placeholder="Sélectionnez un type..."
-              optionFilterProp="label"
-            />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item label="Région" name="region">
-            <Select
-              showSearch
-              options={province.map((item) => ({
-                value: item.id,
-                label: item.name_fr,
-              }))}
-              placeholder="Sélectionnez une province..."
-              optionFilterProp="label"
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            label="Latitude"
-            name="latitude"
-            rules={[
-              { type: "number", min: -90, max: 90, message: "Latitude invalide" },
-            ]}
-          >
-            <InputNumber
-              placeholder="Ex: 4.345678"
-              step={0.000001}
-              style={{ width: "100%" }}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            label="Longitude"
-            name="longitude"
-            rules={[
-              { type: "number", min: -180, max: 180, message: "Longitude invalide" },
-            ]}
-          >
-            <InputNumber
-              placeholder="Ex: 15.345678"
-              step={0.000001}
-              style={{ width: "100%" }}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-      
-      <Form.Item
-        label="Description (mise en forme)"
-        name="description"
-        rules={[{ required: true, message: "La description est obligatoire" }]}
-      >
-        <ReactQuill
-          theme="snow"
-          modules={quillModules}
-          formats={quillFormats}
-          value={form.getFieldValue("description")}
-          onChange={(html) => form.setFieldsValue({ description: html })}
-          placeholder="Rédigez ici avec titres, tailles, alignements…"
-          style={{ background: "#fff" }}
-        />
-      </Form.Item>
-
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item label="Date collecte" name="date_collecte">
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item label="Accès" name="acces" initialValue="abonne">
-            <Radio.Group>
-              <Radio value="public">Public</Radio>
-              <Radio value="abonne">Abonné</Radio>
-            </Radio.Group>
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item label="Fichier">
-            <Upload
-              beforeUpload={(file) => handleBeforeUpload(file, "file")}
-              showUploadList={false}
+      <Form form={form} layout="vertical" onFinish={handleFinish}>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label="Type de donnée"
+              name="id_type"
+              rules={[{ required: true, message: "Le type est obligatoire" }]}
             >
-              <Button icon={<UploadOutlined />}>Téléverser le fichier</Button>
-            </Upload>
-            {filePreview && (
-              <div style={{ marginTop: 8 }}>
-                {filePreview.name || filePreview}
-              </div>
-            )}
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item label="Vignette">
-            <Upload
-              beforeUpload={(file) => handleBeforeUpload(file, "thumb")}
-              showUploadList={false}
+              <Select
+                showSearch
+                options={types.map((item) => ({
+                  value: item.id_type,
+                  label: item.nom_type,
+                }))}
+                placeholder="Sélectionnez un type..."
+                optionFilterProp="label"
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Titre"
+              name="titre"
+              rules={[{ required: true, message: "Le titre est obligatoire" }]}
             >
-              <Button icon={<UploadOutlined />}>Téléverser la vignette</Button>
-            </Upload>
-            {thumbPreview && (
-              <div style={{ marginTop: 8 }}>
-                <img
-                  src={URL.createObjectURL(thumbPreview)}
-                  alt="Vignette"
-                  width={100}
-                />
-              </div>
-            )}
-          </Form.Item>
-        </Col>
-      </Row>
+              <Input placeholder="Titre de la donnée" />
+            </Form.Item>
+          </Col>
+        </Row>
 
-      <Form.Item
-        label="Meta (JSON)"
-        name="meta"
-        rules={[
-          {
-            validator: (_, value) => {
-              if (!value) return Promise.resolve();
-              try {
-                JSON.parse(value);
-                return Promise.resolve();
-              } catch {
-                return Promise.reject(new Error("JSON invalide"));
-              }
-            },
-          },
-        ]}
-      >
-        <TextArea rows={3} placeholder='{"key":"value"}' />
-      </Form.Item>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item label="Pays" name="pays">
+              <Select
+                showSearch
+                options={pays.map((item) => ({ value: item.id_pays, label: item.nom_pays }))}
+                placeholder="Sélectionnez un pays..."
+                optionFilterProp="label"
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label="Région" name="region">
+              <Select
+                showSearch
+                options={province.map((item) => ({ value: item.id, label: item.name_fr }))}
+                placeholder="Sélectionnez une province..."
+                optionFilterProp="label"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
-      <Form.Item>
-        <Button type="primary" htmlType="submit" loading={loading} block>
-          {record ? "Mettre à jour" : "Ajouter"}
-        </Button>
-      </Form.Item>
-    </Form>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label="Latitude"
+              name="latitude"
+              rules={[{ type: "number", min: -90, max: 90, message: "Latitude invalide" }]}
+            >
+              <InputNumber placeholder="Ex: 4.345678" step={0.000001} style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Longitude"
+              name="longitude"
+              rules={[{ type: "number", min: -180, max: 180, message: "Longitude invalide" }]}
+            >
+              <InputNumber placeholder="Ex: 15.345678" step={0.000001} style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item
+          label="Description (mise en forme)"
+          name="description"
+          rules={[{ required: true, message: "La description est obligatoire" }]}
+        >
+          <ReactQuill
+            theme="snow"
+            modules={quillModules}
+            formats={quillFormats}
+            value={form.getFieldValue("description")}
+            onChange={(html) => form.setFieldsValue({ description: html })}
+            placeholder="Rédigez ici avec titres, tailles, alignements…"
+            style={{ background: "#fff", borderRadius: 8, height: 150, marginBottom: 50 }}
+          />
+        </Form.Item>
+
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item label="Date collecte" name="date_collecte">
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label="Accès" name="acces" initialValue="abonne">
+              <Radio.Group>
+                <Radio value="public">Public</Radio>
+                <Radio value="abonne">Abonné</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item label="Fichier">
+              <Upload
+                beforeUpload={(file) => handleBeforeUpload(file, "file")}
+                showUploadList={false}
+              >
+                <Button icon={<UploadOutlined />} shape="round">
+                  Téléverser le fichier
+                </Button>
+              </Upload>
+              {filePreview && (
+                <div style={{ marginTop: 8 }}>
+                  {filePreview.name || filePreview}
+                </div>
+              )}
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label="Vignette">
+              <Upload
+                beforeUpload={(file) => handleBeforeUpload(file, "thumb")}
+                showUploadList={false}
+              >
+                <Button icon={<UploadOutlined />} shape="round">
+                  Téléverser la vignette
+                </Button>
+              </Upload>
+              {thumbPreview && (
+                <div style={{ marginTop: 8 }}>
+                  <img
+                    src={thumbPreview instanceof File ? URL.createObjectURL(thumbPreview) : thumbPreview}
+                    alt="Vignette"
+                    width={100}
+                    style={{ borderRadius: 8 }}
+                  />
+                </div>
+              )}
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" loading={loading} block shape="round">
+            {record ? "Mettre à jour" : "Ajouter"}
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
   );
 };
 
